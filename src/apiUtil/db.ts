@@ -1,5 +1,4 @@
 import * as sqlite3 from "sqlite3";
-import { Database } from "sqlite3";
 const sqlite = sqlite3.verbose();
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
