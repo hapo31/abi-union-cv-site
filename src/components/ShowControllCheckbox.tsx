@@ -3,23 +3,25 @@ import styled from "@emotion/styled";
 import { Card, Checkbox, FormControlLabel } from "@mui/material";
 import { useForm } from "react-hook-form";
 
-export type GameCheckboxValue = {
+export type CheckboxValue = {
   arknights: boolean;
   bluearchive: boolean;
   imasCinderella: boolean;
 };
 
 type Props = {
-  onChange: (e: GameCheckboxValue) => void;
+  onChange: (e: CheckboxValue) => void;
 };
 
-export default function GameCheckbox({ onChange: onChangeHandler }: Props) {
-  const [values, dispatch] = useClientSideLocalStorage<GameCheckboxValue>(
+export default function ShowControllCheckbox({
+  onChange: onChangeHandler,
+}: Props) {
+  const [values, dispatch] = useClientSideLocalStorage<CheckboxValue>(
     "checkbox",
     undefined
   );
 
-  const { register, getValues } = useForm<GameCheckboxValue>({
+  const { register, getValues } = useForm<CheckboxValue>({
     defaultValues: values,
   });
 
