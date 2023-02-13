@@ -5,12 +5,12 @@ import {
   Table,
   TableBody,
   TableCell,
+  tableCellClasses,
   TableContainer,
   TableHead,
   TableRow,
 } from "@mui/material";
 import { CheckboxValue } from "./ShowController";
-
 type Props = {
   records: Character[];
   activeColumns: CheckboxValue;
@@ -18,54 +18,54 @@ type Props = {
 
 export default function CVTable({ records, activeColumns }: Props) {
   return (
-    <TableContainer sx={{ px: 1 }}>
+    <TableContainer>
       <Table>
         <TableHead>
-          <TableRow>
+          <StyledHeaderRow>
             <TableCell>声優名</TableCell>
             <CharaCell
-              active={!!activeColumns?.arknights}
-              activeColor="#f8f8ad"
+              sx={{
+                "&:after": {
+                  display: "inline",
+                  content: activeColumns?.arknights ? '"✔"' : '"  "',
+                  ml: 1,
+                },
+              }}
             >
               アークナイツ
             </CharaCell>
             <CharaCell
-              active={!!activeColumns?.bluearchive}
-              activeColor="#90caf9"
+              sx={{
+                "&:after": {
+                  display: "inline",
+                  content: activeColumns?.bluearchive ? '"✔"' : '"  "',
+                  ml: 1,
+                },
+              }}
             >
               ブルーアーカイブ
             </CharaCell>
             <CharaCell
-              active={!!activeColumns?.imasCinderella}
-              activeColor="#f8c2df"
+              sx={{
+                "&:after": {
+                  display: "inline",
+                  content: activeColumns?.imasCinderella ? '"✔"' : '"  "',
+                  ml: 1,
+                },
+              }}
             >
               アイドルマスター シンデレラガールズ
             </CharaCell>
-          </TableRow>
+          </StyledHeaderRow>
         </TableHead>
         <TableBody>
           {records.map((row) => (
-            <TableRow key={row.id}>
+            <StyledRow key={row.id}>
               <TableCell>{row.voiceActor}</TableCell>
-              <CharaCell
-                active={!!activeColumns?.arknights}
-                activeColor="#ffffe4"
-              >
-                {row.arknightsCharacterName ?? "-"}
-              </CharaCell>
-              <CharaCell
-                active={!!activeColumns?.bluearchive}
-                activeColor="#d1eaff"
-              >
-                {row.blueArchiveCharacterName ?? "-"}
-              </CharaCell>
-              <CharaCell
-                active={!!activeColumns?.imasCinderella}
-                activeColor="#fde4f1"
-              >
-                {row.imasCynderellaName ?? "-"}
-              </CharaCell>
-            </TableRow>
+              <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>
+              <CharaCell>{row.blueArchiveCharacterName ?? "-"}</CharaCell>
+              <CharaCell>{row.imasCynderellaName ?? "-"}</CharaCell>
+            </StyledRow>
           ))}
         </TableBody>
       </Table>
@@ -73,16 +73,23 @@ export default function CVTable({ records, activeColumns }: Props) {
   );
 }
 
-type CellProps = {
-  active: boolean;
-  activeColor: string;
-};
-
 const CharaCell = styled(TableCell)`
-  ${(props: CellProps) =>
-    !props.active ? "" : `background-color: ${props.activeColor};`}
-
   transition: 100ms;
   width: 25%;
   margin: 1px;
+`;
+
+const StyledHeaderRow = styled(TableRow)`
+  background-color: #178de1;
+  > .${tableCellClasses.head} {
+    color: #fff;
+    font-weight: bold;
+  }
+`;
+
+const StyledRow = styled(TableRow)`
+  background-color: #fff;
+  &:nth-of-type(odd) {
+    background-color: #e8f9ff;
+  }
 `;
