@@ -1,5 +1,6 @@
 import fetcher from "@/apiUtil/fetcher";
 import "@/styles/globals.css";
+import styled from "@emotion/styled";
 import type { AppProps } from "next/app";
 import { SWRConfig } from "swr/_internal";
 
@@ -16,7 +17,13 @@ export default function App({ Component, pageProps }: AppProps) {
         // fallbackData: {},
       }}
     >
-      <Component {...pageProps} />
+      <AppContainer className="app-container">
+        <Component {...pageProps} />
+      </AppContainer>
     </SWRConfig>
   );
 }
+
+const AppContainer = styled.div`
+  min-width: 768px;
+`;
