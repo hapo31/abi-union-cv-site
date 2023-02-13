@@ -1,8 +1,14 @@
 export type CVEntity = {
-  id: number;
+  arknights_id?: number;
+  bluearchive_id?: number;
+  imas_cinderella_id?: number;
+  arknights_cv_name?: string;
+  bluearchive_cv_name?: string;
+  imas_cinderella_cv_name?: string;
+  arknights_cv_name_read?: string;
+  bluearchive_cv_name_read?: string;
+  imas_cinderella_cv_name_read?: string;
   arknights_chara?: string;
   bluearchive_chara?: string;
   imas_cinderella_chara?: string;
-  cv_name: string;
-  cv_name_read: string;
 };

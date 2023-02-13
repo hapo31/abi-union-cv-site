@@ -4,7 +4,7 @@ import { GameType } from "@/pages/api/cv";
 import useSWR from "swr";
 
 export type Character = {
-  id: number;
+  id: string;
   voiceActor: string;
   voiceActorReading: string;
   blueArchiveCharacterName?: string;
@@ -16,20 +16,28 @@ type Query = Record<GameType, boolean>;
 
 export default function useCharactersStore(query: Query) {
   const { data, error, isLoading, isValidating, mutate } = useSWR(
-    () => validateQuery("CVDatabase", query),
-    async ([key, query]) => {
-      if (validateQuery(key, query) != null) {
-        const res = await fetchCVDatabase(query);
-        return res.payload.map<Character>((row) => ({
-          id: row.id,
-          voiceActor: row.cv_name,
-          voiceActorReading: row.cv_name_read,
-          arknightsCharacterName: row.arknights_chara,
-          blueArchiveCharacterName: row.bluearchive_chara,
-          imasCynderellaName: row.imas_cinderella_chara,
-        }));
-      }
-      return undefined;
+    ["CVDatabase", query],
+    async ([, query]) => {
+      const res = await fetchCVDatabase(query);
+      return res.payload.map(
+        (row) =>
+          ({
+            id: `a${row.arknights_id}_b${row.bluearchive_id}_i${row.imas_cinderella_id}`,
+            voiceActor: selectNonNull([
+              row.arknights_cv_name,
+              row.bluearchive_cv_name,
+              row.imas_cinderella_cv_name,
+            ]),
+            voiceActorReading: selectNonNull([
+              row.arknights_cv_name_read,
+              row.bluearchive_cv_name_read,
+              row.imas_cinderella_cv_name_read,
+            ]),
+            arknightsCharacterName: row.arknights_chara,
+            blueArchiveCharacterName: row.bluearchive_chara,
+            imasCynderellaName: row.imas_cinderella_chara,
+          } satisfies Character)
+      );
     }
   );
 
@@ -46,22 +54,32 @@ export default function useCharactersStore(query: Query) {
 async function fetchCVDatabase(
   query: Record<GameType, boolean>
 ): Promise<Response<CVEntity[]>> {
+  const param = Object.entries(query)
+    .filter(([_, value]) => value)
+    .map(([key]) => key)
+    .join(",");
+
   const res = await fetch(
-    "/api/cv?" +
-      new URLSearchParams({
-        database: Object.entries(query)
-          .filter(([_, value]) => value)
-          .map(([key]) => key)
-          .join(","),
-      })
+    "/api/cv" +
+      (param.length > 0
+        ? "?" +
+          new URLSearchParams({
+            database: Object.entries(query)
+              .filter(([_, value]) => value)
+              .map(([key]) => key)
+              .join(","),
+          })
+        : "")
   );
 
   return await res.json();
 }
 
-function validateQuery(key: string, query?: Query): [string, Query] | null {
-  return query == null ||
-    !(query.arknights || query.bluearchive || query.imas_cinderella)
-    ? null
-    : [key, query];
+function selectNonNull(values: (string | undefined)[]): string {
+  const r = values.filter((v) => v != null)[0];
+  if (r == null) {
+    throw new Error(`value is all null or undefined`);
+  }
+
+  return r;
 }

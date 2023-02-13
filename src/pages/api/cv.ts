@@ -21,42 +21,42 @@ export default async function handler(
 ) {
   const databaseQuery = req.query["database"];
 
-  if (databaseQuery == null || databaseQuery.length === 0) {
-    responseError(
-      res,
-      "BadRequest",
-      "At least one of 'arknights' 'bluearchive' 'imas_cinderella' must be specified in 'database' query"
-    );
-    return;
-  }
+  const targetTables = ["arknights", "bluearchive", "imas_cinderella"];
 
-  const targetTableNames = Array.isArray(databaseQuery)
+  const filterTableNames = Array.isArray(databaseQuery)
     ? databaseQuery
-    : databaseQuery.split(",");
+    : databaseQuery?.split(",") ?? [];
 
-  if (!isValidOrReponseError(res, t.array(validateQuery), targetTableNames)) {
+  if (!isValidOrReponseError(res, t.array(validateQuery), filterTableNames)) {
     return;
   }
 
   try {
-    if (targetTableNames.length === 1) {
-      const rows = await all(`select * from ${targetTableNames[0]}`);
+    const selectCharaAliases = targetTables
+      .map(
+        (table) =>
+          ` ${table}.cv_name as ${table}_cv_name, ${table}.cv_name_read as ${table}_cv_name_read, ${table}.id as ${table}_id, ${table}.chara as ${table}_chara`
+      )
+      .join(", ");
+    const joinOnPlaceHolder = targetTables
+      .filter((_, i) => i >= 1)
+      .map(
+        (table) =>
+          `full right join ${table} on ${targetTables[0]}.cv_name = ${table}.cv_name`
+      )
+      .join(" ");
+
+    const filterPlaceHolder = filterTableNames
+      .map((table) => `${table}_chara is not null`)
+      .join(" and ");
+
+    if (filterTableNames.length === 0) {
+      const sql = `select ${selectCharaAliases} from ${targetTables[0]} ${joinOnPlaceHolder}`;
+      const rows = await all(sql);
       responseOk(res, rows);
     } else {
-      const selectCharaAliases = targetTableNames
-        .map((table) => `${table}.chara as ${table}_chara`)
-        .join(", ");
-      const joinOnPlaceHolder = targetTableNames
-        .filter((_, i) => i >= 1)
-        .map(
-          (table) =>
-            `inner join ${table} on ${targetTableNames[0]}.cv_name = ${table}.cv_name`
-        )
-        .join(" ");
-
-      const rows = await all(
-        `select ${targetTableNames[0]}.id, ${targetTableNames[0]}.cv_name, ${targetTableNames[0]}.cv_name_read, ${selectCharaAliases} from ${targetTableNames[0]} ${joinOnPlaceHolder}`
-      );
+      const sql = `select ${filterTableNames[0]}.cv_name, ${filterTableNames[0]}.cv_name_read, ${selectCharaAliases} from ${targetTables[0]} ${joinOnPlaceHolder} where ${filterPlaceHolder}`;
+      const rows = await all(sql);
       responseOk(res, rows);
     }
   } catch (e) {

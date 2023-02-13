@@ -14,12 +14,12 @@ export default function App() {
   );
 
   const { data, isLoading, refetch, error } = useCharactersStore({
-    arknights: checkbox?.arknights ?? true,
+    arknights: checkbox?.arknights ?? false,
     bluearchive: checkbox?.bluearchive ?? false,
     imas_cinderella: checkbox?.imasCinderella ?? false,
   });
 
-  console.log(error);
+  console.log(data);
 
   return (
     <Box>
