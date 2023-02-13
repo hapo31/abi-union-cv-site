@@ -38,19 +38,17 @@ export default function App() {
           />
         </Card>
       </Box>
-      {isLoading || data == null ? (
-        <CircularProgress />
-      ) : error ? (
-        <Box flex="vertical">
+      <Box display="flex">
+        {isLoading || data == null ? (
+          <CircularProgress />
+        ) : error ? (
           <code style={{ backgroundColor: "#f99" }}>
             {JSON.stringify(error, null, "\t")}
           </code>
-        </Box>
-      ) : (
-        <Box flex="vertical">
+        ) : (
           <CVTable activeColumns={checkbox ?? {}} records={data} />
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   );
 }
