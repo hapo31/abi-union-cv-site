@@ -1,4 +1,3 @@
-import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
 import styled from "@emotion/styled";
 import {
   Box,
@@ -8,10 +7,10 @@ import {
   TextField,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import IconButton from "@mui/material/IconButton";
 import { useForm } from "react-hook-form";
-import { useDebounce } from "react-use";
+import { useDebounce, useLocalStorage } from "react-use";
 import { useState } from "react";
+import dynamic from "next/dynamic";
 
 export type CheckboxValue = {
   arknights?: boolean;
@@ -27,11 +26,8 @@ type Props = {
   onChange: (e: CheckboxValue) => void;
 };
 
-export default function ShowController({ onChange: onChangeHandler }: Props) {
-  const [values, dispatch] = useClientSideLocalStorage<CheckboxValue>(
-    "checkbox",
-    {}
-  );
+function ShowController({ onChange: onChangeHandler }: Props) {
+  const [values, dispatch] = useLocalStorage<CheckboxValue>("checkbox", {});
 
   const { register, getValues } = useForm<FormValues>({
     defaultValues: { ...values, search: "" },
@@ -41,9 +37,12 @@ export default function ShowController({ onChange: onChangeHandler }: Props) {
   useDebounce(
     () => {
       const val = formValues;
-      dispatch(val);
+      dispatch({
+        arknights: val.arknights,
+        bluearchive: val.bluearchive,
+        imasCinderella: val.imasCinderella,
+      });
       onChangeHandler(val);
-      console.log(val);
     },
     200,
     [formValues]
@@ -60,20 +59,17 @@ export default function ShowController({ onChange: onChangeHandler }: Props) {
         <Box display="flex" justifyContent="space-evenly">
           <FormControlLabel
             {...register("arknights")}
-            defaultChecked={values?.arknights}
-            control={<Checkbox />}
+            control={<Checkbox defaultChecked={values?.arknights} />}
             label="アークナイツ"
           />
           <FormControlLabel
             {...register("bluearchive")}
-            defaultChecked={values?.bluearchive}
-            control={<Checkbox />}
+            control={<Checkbox defaultChecked={values?.bluearchive} />}
             label="ブルーアーカイブ"
           />
           <FormControlLabel
             {...register("imasCinderella")}
-            defaultChecked={values?.imasCinderella}
-            control={<Checkbox />}
+            control={<Checkbox defaultChecked={values?.imasCinderella} />}
             label="アイドルマスターシンデレラガールズ"
           />
         </Box>
@@ -89,7 +85,7 @@ export default function ShowController({ onChange: onChangeHandler }: Props) {
           <TextField
             fullWidth
             {...register("search")}
-            label="声優名、声優のよみがな、キャラ名、キャラの読み仮名..."
+            label="声優名、声優の読み仮名、キャラ名、キャラの読み仮名..."
             variant="standard"
             sx={{ height: "40px" }}
           />
@@ -98,6 +94,17 @@ export default function ShowController({ onChange: onChangeHandler }: Props) {
     </Wrap>
   );
 }
+
+const ShowControllerDynamic = dynamic(
+  {
+    loader: async () => ShowController,
+  },
+  {
+    ssr: false,
+  }
+);
+
+export default ShowControllerDynamic;
 
 const Wrap = styled(Card)`
   width: 100%;
