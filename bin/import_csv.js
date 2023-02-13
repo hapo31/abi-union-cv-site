@@ -55,9 +55,9 @@ async function imporFromtCsv(db, tableName, csvPath) {
 
       try {
         db.serialize(() => {
-          const state = db.prepare(`insert or ignore into ${tableName} (cv_name, cv_name_read, chara) values (?, ?, ?)`);
+          const state = db.prepare(`insert or ignore into ${tableName} (cv_name, cv_name_read, chara, chara_read) values (?, ?, ?, ?)`);
           // placeholder への適用
-          records.forEach(row => state.run([row[0], row[1], row[2]]));
+          records.forEach(row => state.run([row[0], row[1], row[2], row[3]]));
           state.finalize(function (err) {
             if (err) {
               console.error("db.run", err);
