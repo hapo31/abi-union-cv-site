@@ -1,7 +1,5 @@
 import { AppBar, Box, Button, Card, Toolbar } from "@mui/material";
-import ShowControllCheckbox, {
-  CheckboxValue,
-} from "@/components/ShowControllCheckbox";
+import ShowController, { CheckboxValue } from "@/components/ShowController";
 import useCharactersStore from "@/store/useCharactersStore";
 import CircularProgress from "@mui/material/CircularProgress";
 import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
@@ -10,7 +8,7 @@ import CVTable from "@/components/CVTable";
 export default function App() {
   const [checkbox, dispatch] = useClientSideLocalStorage<CheckboxValue>(
     "checkbox",
-    undefined
+    {}
   );
 
   const { data, isLoading, refetch, error } = useCharactersStore({
@@ -18,8 +16,6 @@ export default function App() {
     bluearchive: checkbox?.bluearchive ?? false,
     imas_cinderella: checkbox?.imasCinderella ?? false,
   });
-
-  console.log(data);
 
   return (
     <Box>
@@ -33,10 +29,9 @@ export default function App() {
             p: 3,
             backgroundColor: "#9ff",
             justifyContent: "center",
-            width: "100vw",
           }}
         >
-          <ShowControllCheckbox
+          <ShowController
             onChange={(values) => {
               dispatch(values);
             }}
@@ -53,7 +48,7 @@ export default function App() {
         </Box>
       ) : (
         <Box flex="vertical">
-          <CVTable records={data} />
+          <CVTable activeColumns={checkbox ?? {}} records={data} />
         </Box>
       )}
     </Box>
