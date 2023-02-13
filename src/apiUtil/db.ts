@@ -3,7 +3,10 @@ const sqlite = sqlite3.verbose();
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
 const db = new sqlite.Database(dbName);
-db.on("trace", (sql) => console.log(sql));
+
+if (process.env.NODE_ENV === "development") {
+  db.on("trace", (sql) => console.log(sql));
+}
 db.on("error", (err) => console.error(err));
 
 export default async function all<T = any>(
