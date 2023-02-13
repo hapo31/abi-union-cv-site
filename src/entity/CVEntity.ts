@@ -11,4 +11,7 @@ export type CVEntity = {
   arknights_chara?: string;
   bluearchive_chara?: string;
   imas_cinderella_chara?: string;
+  arknights_chara_read?: string;
+  bluearchive_chara_read?: string;
+  imas_cinderella_chara_read?: string;
 };

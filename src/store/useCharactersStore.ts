@@ -10,6 +10,9 @@ export type Character = {
   blueArchiveCharacterName?: string;
   arknightsCharacterName?: string;
   imasCynderellaName?: string;
+  blueArchiveCharacterNameReading?: string;
+  arknightsCharacterNameReading?: string;
+  imasCynderellaNameReading?: string;
 };
 
 type Query = Record<GameType, boolean>;
@@ -36,8 +39,14 @@ export default function useCharactersStore(query: Query) {
             arknightsCharacterName: row.arknights_chara,
             blueArchiveCharacterName: row.bluearchive_chara,
             imasCynderellaName: row.imas_cinderella_chara,
+            arknightsCharacterNameReading: row.arknights_chara_read,
+            blueArchiveCharacterNameReading: row.bluearchive_chara_read,
+            imasCynderellaNameReading: row.imas_cinderella_chara_read,
           } satisfies Character)
       );
+    },
+    {
+      keepPreviousData: true,
     }
   );
 
