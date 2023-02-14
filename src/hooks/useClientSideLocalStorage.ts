@@ -1,29 +1,43 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
+import { atom, useAtom } from "jotai";
+
+const localStorageAtom = atom<Record<string, unknown>>({});
 
 export default function useClientSideLocalStorage<T>(
   key: string,
   defaultValue?: T
 ): [T | undefined, (v: T) => void] {
-  const [value, setValue] = useState<T>();
+  const [storage, setStorage] = useAtom(localStorageAtom);
+
+  const setValue = useCallback(
+    (key: string, value: unknown) => {
+      setStorage((prev) => ({ ...prev, [key]: value }));
+    },
+    [setStorage]
+  );
+
   useEffect(() => {
-    if (value == null) {
+    if (storage[key] === undefined) {
       const str = localStorage.getItem(key);
       if (str != null) {
-        setValue(JSON.parse(str));
+        setValue(key, JSON.parse(str));
       } else if (defaultValue != null) {
-        setValue(defaultValue);
+        setValue(key, defaultValue);
         localStorage.setItem(key, JSON.stringify(defaultValue));
+      } else {
+        setValue(key, null);
       }
     }
-  }, [defaultValue, key, value]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   const dispatch = useCallback(
     (value: T) => {
-      setValue(value);
+      setValue(key, value);
       localStorage.setItem(key, JSON.stringify(value));
     },
-    [key]
+    [key, setValue]
   );
 
-  return [value, dispatch];
+  return [storage[key] as T, dispatch];
 }
