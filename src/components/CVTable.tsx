@@ -1,6 +1,8 @@
-import { Character } from "@/store/useCharactersStore";
+import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
+import useCharactersStore, { Character } from "@/store/useCharactersStore";
 
 import {
+  CircularProgress,
   styled,
   Table,
   TableBody,
@@ -10,14 +12,22 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import dynamic from "next/dynamic";
 
 import { CheckboxValue } from "./ShowController";
 type Props = {
-  records: Character[];
   activeColumns: CheckboxValue;
 };
 
-export default function CVTable({ records, activeColumns }: Props) {
+function CVTable({ activeColumns }: Props) {
+  const [checkbox] = useClientSideLocalStorage<CheckboxValue>("checkbox", {});
+
+  const { data: records, isLoading } = useCharactersStore({
+    arknights: checkbox?.arknights ?? false,
+    bluearchive: checkbox?.bluearchive ?? false,
+    imas_cinderella: checkbox?.imasCinderella ?? false,
+  });
+
   return (
     <TableContainer>
       <Table>
@@ -60,19 +70,30 @@ export default function CVTable({ records, activeColumns }: Props) {
           </StyledHeaderRow>
         </TableHead>
         <TableBody>
-          {records.map((row) => (
-            <StyledRow key={row.id}>
-              <TableCell>{row.voiceActor}</TableCell>
-              <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>
-              <CharaCell>{row.blueArchiveCharacterName ?? "-"}</CharaCell>
-              <CharaCell>{row.imasCynderellaName ?? "-"}</CharaCell>
-            </StyledRow>
-          ))}
+          {records == null || isLoading ? (
+            <CircularProgress />
+          ) : (
+            records.map((row) => (
+              <StyledRow key={row.id}>
+                <TableCell>{row.voiceActor}</TableCell>
+                <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>
+                <CharaCell>{row.blueArchiveCharacterName ?? "-"}</CharaCell>
+                <CharaCell>{row.imasCynderellaName ?? "-"}</CharaCell>
+              </StyledRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </TableContainer>
   );
 }
+
+const CVTableDynamic = dynamic({
+  loader: async () => CVTable,
+  ssr: false,
+});
+
+export default CVTableDynamic;
 
 const CharaCell = styled(TableCell)`
   transition: 100ms;
