@@ -22,20 +22,16 @@ export default function App() {
       <AppBar position="static">
         <Toolbar>アークナイツ・ブルアカ・デレ共通の声優を調べるやつ</Toolbar>
       </AppBar>
-      <Box>
+      <Box position="sticky" top="0">
         <Card
           sx={{
             display: "flex",
-            p: 3,
+            p: 1,
             backgroundColor: "#9ff",
             justifyContent: "center",
           }}
         >
-          <ShowController
-            onChange={(values) => {
-              dispatch(values);
-            }}
-          />
+          <ShowController onChange={dispatch} />
         </Card>
       </Box>
       <Box display="flex">

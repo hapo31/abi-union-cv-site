@@ -10,6 +10,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+
 import { CheckboxValue } from "./ShowController";
 type Props = {
   records: Character[];
@@ -76,7 +77,7 @@ export default function CVTable({ records, activeColumns }: Props) {
 const CharaCell = styled(TableCell)`
   transition: 100ms;
   width: 25%;
-  margin: 1px;
+  padding: 5px;
 `;
 
 const StyledHeaderRow = styled(TableRow)`
@@ -88,8 +89,12 @@ const StyledHeaderRow = styled(TableRow)`
 `;
 
 const StyledRow = styled(TableRow)`
+  transition: 200ms;
   background-color: #fff;
   &:nth-of-type(odd) {
     background-color: #e8f9ff;
+  }
+  &:hover {
+    background-color: #cfedf8;
   }
 `;
