@@ -1,5 +1,6 @@
 import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
 import useCharactersStore, { Character } from "@/store/useCharactersStore";
+import useSearchFilter from "@/store/useSearchFilterCharacter";
 
 import {
   CircularProgress,
@@ -13,6 +14,7 @@ import {
   TableRow,
 } from "@mui/material";
 import dynamic from "next/dynamic";
+import { useMemo } from "react";
 
 import { CheckboxValue } from "./ShowController";
 type Props = {
@@ -27,6 +29,37 @@ function CVTable({ activeColumns }: Props) {
     bluearchive: checkbox?.bluearchive ?? false,
     imas_cinderella: checkbox?.imasCinderella ?? false,
   });
+
+  const { search } = useSearchFilter();
+
+  const filteredRecords = useMemo(
+    () =>
+      search == null
+        ? records
+        : records?.filter(
+            ({
+              arknightsCharacterName,
+              arknightsCharacterNameReading,
+              blueArchiveCharacterName,
+              blueArchiveCharacterNameReading,
+              imasCynderellaName,
+              imasCynderellaNameReading,
+              voiceActor,
+              voiceActorReading,
+            }) =>
+              [
+                arknightsCharacterName,
+                arknightsCharacterNameReading,
+                blueArchiveCharacterName,
+                blueArchiveCharacterNameReading,
+                imasCynderellaName,
+                imasCynderellaNameReading,
+                voiceActor,
+                voiceActorReading,
+              ].some((str) => str?.includes(search))
+          ),
+    [records, search]
+  );
 
   return (
     <TableContainer>
@@ -70,10 +103,10 @@ function CVTable({ activeColumns }: Props) {
           </StyledHeaderRow>
         </TableHead>
         <TableBody>
-          {records == null || isLoading ? (
+          {filteredRecords == null || isLoading ? (
             <CircularProgress />
           ) : (
-            records.map((row) => (
+            filteredRecords.map((row) => (
               <StyledRow key={row.id}>
                 <TableCell>{row.voiceActor}</TableCell>
                 <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>

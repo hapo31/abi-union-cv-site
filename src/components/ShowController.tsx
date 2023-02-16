@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { useDebounce, useLocalStorage } from "react-use";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import useSearchFilter from "@/store/useSearchFilterCharacter";
 
 export type CheckboxValue = {
   arknights?: boolean;
@@ -34,6 +35,8 @@ function ShowController({ onChange: onChangeHandler }: Props) {
   });
   const [formValues, setFormValues] = useState(getValues());
 
+  const { setSearch } = useSearchFilter();
+
   useDebounce(
     () => {
       const val = formValues;
@@ -42,6 +45,7 @@ function ShowController({ onChange: onChangeHandler }: Props) {
         bluearchive: val.bluearchive,
         imasCinderella: val.imasCinderella,
       });
+      setSearch(val.search);
       onChangeHandler(val);
     },
     200,
