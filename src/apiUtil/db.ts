@@ -6,18 +6,19 @@ const sqlite = sqlite3.verbose();
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
 
+const pwd = process.cwd();
+
+const files = await fs.readdir(pwd);
+const dirs = files.filter(async (f) =>
+  (await fs.stat(path.join(pwd, f))).isDirectory()
+);
+console.error(dirs.join("\n"));
+
 let db: sqlite3.Database;
 try {
   db = new sqlite.Database(dbName);
 } catch (e) {
-  const pwd = process.cwd();
-
-  const files = await fs.readdir(pwd);
-  const dirs = files.filter(async (f) =>
-    (await fs.stat(path.join(pwd, f))).isDirectory()
-  );
   console.error(e);
-  console.error(dirs.join("\n"));
   process.exit(1);
 }
 
