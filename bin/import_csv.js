@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const { readFile } = require("fs/promises");
 const path = require("path");
 const { Database } = require("sqlite3");
+const fs = require("fs/promises");
 
 (async () => {
   const stage = process.env.STAGE;
@@ -13,6 +14,12 @@ const { Database } = require("sqlite3");
   });
 
   const dbName = path.join(process.cwd(), process.env["SQLITE_DB_NAME"]);
+
+  try {
+    const parent = path.dirname(dbName);
+    fs.mkdir(parent, { recursive: true });
+  } catch {
+  }
 
   const createTableSQLs = (await readFile("./bin/create_table.sql")).toString().split("\n");
   const db = new sqlite3.Database(dbName);
