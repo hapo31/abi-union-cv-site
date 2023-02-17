@@ -6,14 +6,6 @@ const sqlite = sqlite3.verbose();
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
 
-const pwd = process.cwd();
-
-const files = await fs.readdir(pwd);
-const dirs = files.filter(async (f) =>
-  (await fs.stat(path.join(pwd, f))).isDirectory()
-);
-console.error(dirs.join("\n"));
-
 let db: sqlite3.Database;
 try {
   db = new sqlite.Database(":memory:");
@@ -31,11 +23,18 @@ export default async function all<T = any>(
   sql: string,
   params: unknown = []
 ): Promise<T[]> {
+  const pwd = process.cwd();
+  const files = await fs.readdir(pwd);
+  const dirs = files.filter(async (f) =>
+    (await fs.stat(path.join(pwd, f))).isDirectory()
+  );
+  console.log(dirs.join("\n"));
+
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       db.all(sql, params, (err, row) => {
         if (err) {
-          reject(err);
+          reject({ err, dirs });
         } else {
           resolve(row);
         }
