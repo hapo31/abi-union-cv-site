@@ -25,8 +25,9 @@ export default async function all<T = any>(
   files.push(
     ...(await Promise.all(
       files.map(async (file) =>
-        (await fs.stat(path.join(pwd, file))).isDirectory()
-          ? (await fs.readdir(path.join(pwd, file))).join("\n")
+        (await fs.stat(path.join(pwd, file))).isDirectory() &&
+        file !== "node_modules"
+          ? "L" + (await fs.readdir(path.join(pwd, file))).join("/")
           : path.join(pwd, file)
       )
     ))
