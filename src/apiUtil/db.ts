@@ -16,7 +16,7 @@ console.error(dirs.join("\n"));
 
 let db: sqlite3.Database;
 try {
-  db = new sqlite.Database(dbName);
+  db = new sqlite.Database(":memory:");
 } catch (e) {
   console.error(e);
   process.exit(1);
