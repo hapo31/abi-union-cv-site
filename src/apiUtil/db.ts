@@ -20,19 +20,7 @@ export default async function all<T = any>(
   params: unknown = []
 ): Promise<T[]> {
   const pwd = process.cwd();
-  const files = await fs.readdir(pwd);
-
-  files.push(
-    ...(await Promise.all(
-      files.map(async (file) =>
-        (await fs.stat(path.join(pwd, file))).isDirectory() &&
-        file !== "node_modules"
-          ? "L" + (await fs.readdir(path.join(pwd, file))).join("/")
-          : path.join(pwd, file)
-      )
-    ))
-  );
-
+  const files = await fileStat(pwd);
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       db.all(sql, params, (err, row) => {
@@ -44,4 +32,35 @@ export default async function all<T = any>(
       });
     });
   });
+}
+
+async function fileStat(current: string = process.cwd()) {
+  if (current.startsWith(".")) {
+    return "";
+  }
+
+  const files = await fs.readdir(current);
+
+  if (files.length === 0) {
+    return "";
+  }
+
+  const results: Array<string | Record<string, unknown>> = files.slice();
+
+  for (const file of files) {
+    if (file === "node_modules") {
+      continue;
+    }
+    if (file === process.env["SQLITE_DB_NAME"]) {
+      return files;
+    }
+
+    const nextPath = path.join(current, file as string);
+    const stat = await fs.stat(nextPath);
+    if (stat.isDirectory()) {
+      results.push({ [file as string]: await fileStat(nextPath) });
+    }
+  }
+
+  return results;
 }
