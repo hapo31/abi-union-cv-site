@@ -4,15 +4,11 @@ import path from "path";
 import * as sqlite3 from "sqlite3";
 const sqlite = sqlite3.verbose();
 
-const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
-
-let db: sqlite3.Database;
-try {
-  db = new sqlite.Database(":memory:");
-} catch (e) {
-  console.error(e);
-  process.exit(1);
-}
+const dbName = path.join(
+  process.cwd(),
+  process.env["SQLITE_DB_NAME"] ?? "cv.db"
+);
+const db = new sqlite.Database(dbName);
 
 if (process.env.NODE_ENV === "development") {
   db.on("trace", (sql) => console.log(sql));

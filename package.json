@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "pnpm run db:update; next build",
+    "build": "next build; pnpm run db:update",
     "start": "next start",
     "lint": "next lint",
     "db:update": "node ./bin/import_csv.js"
