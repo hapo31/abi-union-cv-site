@@ -21,16 +21,22 @@ export default async function all<T = any>(
 ): Promise<T[]> {
   const pwd = process.cwd();
   const files = await fs.readdir(pwd);
-  const dirs = files.filter(async (f) =>
-    (await fs.stat(path.join(pwd, f))).isDirectory()
+
+  files.push(
+    ...(await Promise.all(
+      files.map(async (file) =>
+        (await fs.stat(path.join(pwd, file))).isDirectory()
+          ? (await fs.readdir(path.join(pwd, file))).join("\n")
+          : path.join(pwd, file)
+      )
+    ))
   );
-  console.log(dirs.join("\n"));
 
   return new Promise((resolve, reject) => {
     db.serialize(() => {
       db.all(sql, params, (err, row) => {
         if (err) {
-          reject({ err, dirs });
+          reject({ err, files });
         } else {
           resolve(row);
         }
