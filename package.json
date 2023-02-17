@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build; pnpm run db:update",
+    "build": "next build; pnpm run db:update; cp ./static-config.json.in ./.vercel/output/config.json",
     "start": "next start",
     "lint": "next lint",
     "db:update": "node ./bin/import_csv.js"

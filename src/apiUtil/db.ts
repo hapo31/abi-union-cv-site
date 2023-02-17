@@ -8,7 +8,7 @@ const dbName = path.join(
   process.cwd(),
   process.env["SQLITE_DB_NAME"] ?? "cv.db"
 );
-const db = new sqlite.Database(":memory:");
+const db = new sqlite.Database(dbName);
 
 if (process.env.NODE_ENV === "development") {
   db.on("trace", (sql) => console.log(sql));
