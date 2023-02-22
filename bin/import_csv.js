@@ -1,10 +1,7 @@
-const sqlite3 = require("sqlite3").verbose();
+const mysql = require("mysql2/promise");
 const csvParse = require("csv-parse");
 const dotenv = require("dotenv");
 const { readFile } = require("fs/promises");
-const path = require("path");
-const { Database } = require("sqlite3");
-const fs = require("fs/promises");
 
 (async () => {
   const stage = process.env.STAGE;
@@ -13,38 +10,36 @@ const fs = require("fs/promises");
     path: stage ? `.env.${stage}` : ".env"
   });
 
-  const dbName = path.join(process.cwd(), process.env["SQLITE_DB_NAME"]);
+  const host = process.env["MYSQL_HOST"];
+  const user = process.env["MYSQL_USER"];
+  const db = process.env["MYSQL_DATABASE"];
+  const password = process.env["MYSQL_PASSWORD"];
+
+  const createTableSQL = (await readFile("./bin/create_table.sql")).toString().replaceAll("\n", "").replaceAll("  ", " ");
+  const connection = await mysql.createConnection(`mysql://${user}:${password}@${host}/${db}`);
+  await connection.connect();
 
   try {
-    const parent = path.dirname(dbName);
-    fs.mkdir(parent, { recursive: true });
-  } catch {
+    connection.execute(createTableSQL);
+    await imporFromtCsv(connection, "arknights", "./assets/arknights.csv");
+    await imporFromtCsv(connection, "bluearchive", "./assets/bluearchive.csv");
+    await imporFromtCsv(connection, "imas_cinderella", "./assets/imas_cinderella.csv");
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await connection.end();
   }
 
-  const createTableSQLs = (await readFile("./bin/create_table.sql")).toString().split("\n");
-  const db = new sqlite3.Database(dbName);
-
-  createTableSQLs.forEach(sql => {
-    db.run(sql, (_err) => {
-    });
-  })
-
-  await imporFromtCsv(db, "arknights", "./assets/arknights.csv");
-  await imporFromtCsv(db, "bluearchive", "./assets/bluearchive.csv");
-  await imporFromtCsv(db, "imas_cinderella", "./assets/imas_cinderella.csv");
-
-
-  db.close();
-})();
+})().catch(e => console.error(e));
 
 /**
  * 
- * @param {Database} db 
+ * @param {import("mysql2/promise").Connection} connection 
  * @param {string} tableName 
  * @param {string} csvPath 
  * @returns
  */
-async function imporFromtCsv(db, tableName, csvPath) {
+async function imporFromtCsv(connection, tableName, csvPath) {
   return new Promise(async (resolve, reject) => {
     const csv = await readFile(csvPath);
     const parser = csvParse.parse({ delimiter: ",", columns: false });
@@ -53,7 +48,7 @@ async function imporFromtCsv(db, tableName, csvPath) {
      **/
     let records = [];
 
-    parser.on("readable", () => {
+    parser.on("readable", async () => {
       let record;
       while ((record = parser.read()) !== null) {
         records.push(record);
@@ -61,28 +56,17 @@ async function imporFromtCsv(db, tableName, csvPath) {
       // カラム名の行を削除
       records = records.slice(1);
 
+      // placeholder への適用
+      const values = records.map(row => [row[0], row[1], row[2], row[3]])
       try {
-        db.serialize(() => {
-          const state = db.prepare(`insert or ignore into ${tableName} (cv_name, cv_name_read, chara, chara_read) values (?, ?, ?, ?)`);
-          // placeholder への適用
-          records.forEach(row => state.run([row[0], row[1], row[2], row[3]]));
-          state.finalize(function (err) {
-            if (err) {
-              console.error("db.run", err);
-              reject(err);
-              return;
-            }
-            resolve();
-          });
-        });
-      } catch (e) {
-        console.error(e);
+        await connection.query(`insert or ignore into ${tableName} (cv_name, cv_name_read, chara, chara_read) values (??, ??, ??, ??)`, [values]);
         resolve();
+      } catch (err) {
+        reject(err);
       }
     });
 
     parser.on("end", () => {
-
     });
 
     parser.on("error", (err) => {

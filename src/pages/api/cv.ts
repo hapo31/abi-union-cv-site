@@ -6,6 +6,7 @@ import {
 import type { NextApiRequest, NextApiResponse } from "next";
 import * as t from "io-ts";
 import all from "@/apiUtil/db";
+import { CVEntitySchema } from "@/entity/CVEntity";
 
 const validateQuery = t.keyof({
   arknights: null,
@@ -53,10 +54,16 @@ export default async function handler(
     if (filterTableNames.length === 0) {
       const sql = `select ${selectCharaAliases} from ${targetTables[0]} ${joinOnPlaceHolder}`;
       const rows = await all(sql);
+      if (!isValidOrReponseError(res, t.array(CVEntitySchema), rows)) {
+        return;
+      }
       responseOk(res, rows);
     } else {
       const sql = `select ${filterTableNames[0]}.cv_name, ${filterTableNames[0]}.cv_name_read, ${selectCharaAliases} from ${targetTables[0]} ${joinOnPlaceHolder} where ${filterPlaceHolder}`;
       const rows = await all(sql);
+      if (!isValidOrReponseError(res, t.array(CVEntitySchema), rows)) {
+        return;
+      }
       responseOk(res, rows);
     }
   } catch (e) {
