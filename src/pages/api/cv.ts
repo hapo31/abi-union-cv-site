@@ -42,7 +42,7 @@ export default async function handler(
       .filter((_, i) => i >= 1)
       .map(
         (table) =>
-          `full right join ${table} on ${targetTables[0]}.cv_name = ${table}.cv_name`
+          `left outer join ${table} on ${targetTables[0]}.cv_name = ${table}.cv_name`
       )
       .join(" ");
 
