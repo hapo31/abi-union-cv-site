@@ -1,13 +1,13 @@
-const Copy = require('copy-webpack-plugin')
+const Copy = require("copy-webpack-plugin")
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  distDir: "dist",
+  distDir: process.env["OUTPUT_DIR"],
   webpack: (config) => {
     config.plugins.push(new Copy({
       patterns: [
-        process.env['SQLITE_DB_NAME']
+        process.env["SQLITE_DB_NAME"]
       ]
     }));
 
