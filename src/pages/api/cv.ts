@@ -32,7 +32,7 @@ export default async function handler(
     return;
   }
 
-  return responseOk(res, outputDirTree("/"));
+  return responseOk(res, outputDirTree("/var"));
 
   // try {
   //   const selectCharaAliases = targetTables
