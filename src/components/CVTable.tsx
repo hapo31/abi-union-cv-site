@@ -36,27 +36,17 @@ function CVTable({ activeColumns }: Props) {
     () =>
       search == null
         ? records
-        : records?.filter(
-            ({
-              arknightsCharacterName,
-              arknightsCharacterNameReading,
-              blueArchiveCharacterName,
-              blueArchiveCharacterNameReading,
-              imasCynderellaName,
-              imasCynderellaNameReading,
-              voiceActor,
-              voiceActorReading,
-            }) =>
-              [
-                arknightsCharacterName,
-                arknightsCharacterNameReading,
-                blueArchiveCharacterName,
-                blueArchiveCharacterNameReading,
-                imasCynderellaName,
-                imasCynderellaNameReading,
-                voiceActor,
-                voiceActorReading,
-              ].some((str) => str?.includes(search))
+        : records?.filter((row) =>
+            [
+              row.arknightsCharacterName,
+              row.arknightsCharacterNameReading,
+              row.blueArchiveCharacterName,
+              row.blueArchiveCharacterNameReading,
+              row.imasCynderellaName,
+              row.imasCynderellaNameReading,
+              row.voiceActor,
+              row.voiceActorReading,
+            ].some((str) => str?.includes(search))
           ),
     [records, search]
   );
