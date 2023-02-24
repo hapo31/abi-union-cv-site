@@ -1,6 +1,5 @@
 import * as sqlite3 from "sqlite3";
 import path from "path";
-import { readdirSync } from "fs";
 
 const isDev = process.env["NODE_ENV"] === "development";
 
@@ -36,11 +35,6 @@ function initDB() {
     db = new sqlite.Database(dbPath);
     db.on("trace", (sql) => console.log(sql));
   } else {
-    console.log(
-      `${readdirSync(
-        path.resolve(process.cwd(), process.env["OUTPUT_DIR"] ?? ".")
-      )}`
-    );
     db = new sqlite3.Database(dbPath);
   }
   db.on("error", (err) => console.error(err));
