@@ -8,7 +8,7 @@ const nextConfig = {
   webpack: (config) => {
     config.plugins.push(new Copy({
       patterns: [
-        { from: process.env["SQLITE_DB_NAME"], to: path.join("static", "assets") }
+        { from: "assets", to: path.join("assets") }
       ]
     }));
 
