@@ -38,6 +38,3 @@ next-env.d.ts
 
 # *.sqlite3
 # *.db
-
-dist/*
-!dist/.gitkeep
