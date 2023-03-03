@@ -32,10 +32,7 @@ export default async function handler(
     return;
   }
 
-  return responseOk(
-    res,
-    outputDirTree(process.env["DEBUG_DIR"] ?? "/var/task")
-  );
+  return responseOk(res, outputDirTree("/var"));
 
   // try {
   //   const selectCharaAliases = targetTables
