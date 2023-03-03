@@ -3,9 +3,6 @@ import path from "path";
 import { readdirSync } from "fs";
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
-const dbPath = process.env["OUTPUT_DIR"]
-  ? path.resolve(process.cwd(), process.env["OUTPUT_DIR"], dbName)
-  : path.resolve(process.cwd(), dbName);
 let db: sqlite3.Database;
 
 export default async function all<T = any>(
@@ -29,15 +26,11 @@ export default async function all<T = any>(
 function initDB() {
   if (process.env.NODE_ENV === "development") {
     const sqlite = sqlite3.verbose();
-    db = new sqlite.Database(dbPath);
+    db = new sqlite.Database(path.join(process.cwd(), dbName));
     db.on("trace", (sql) => console.log(sql));
   } else {
-    console.log(
-      `${readdirSync(
-        path.resolve(process.cwd(), process.env["OUTPUT_DIR"] ?? ".")
-      )}`
-    );
-    db = new sqlite3.Database(dbPath);
+    console.log(`${readdirSync(path.resolve(process.cwd(), dbName, "../"))}`);
+    db = new sqlite3.Database(path.join(process.cwd(), dbName));
   }
   db.on("error", (err) => console.error(err));
 }
