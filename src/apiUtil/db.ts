@@ -1,6 +1,5 @@
 import * as sqlite3 from "sqlite3";
 import path from "path";
-import { readdirSync } from "fs";
 
 const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
 let db: sqlite3.Database;
@@ -29,7 +28,6 @@ function initDB() {
     db = new sqlite.Database(path.join(process.cwd(), dbName));
     db.on("trace", (sql) => console.log(sql));
   } else {
-    console.log(`${readdirSync(path.resolve(process.cwd(), dbName, "../"))}`);
     db = new sqlite3.Database(path.join(process.cwd(), dbName));
   }
   db.on("error", (err) => console.error(err));
