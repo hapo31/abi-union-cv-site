@@ -36,5 +36,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# *.sqlite3
-# *.db
+*.sqlite3
+*.db
