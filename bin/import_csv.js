@@ -1,3 +1,4 @@
+const fs = require("fs/promises")
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const csvParse = require("csv-parse");
@@ -12,7 +13,7 @@ const { Database } = require("sqlite3");
     path: stage ? `.env.${stage}` : ".env"
   });
 
-  const dbName = path.join(process.env["SQLITE_OUTPUT_DIR"] ?? "", process.env["SQLITE_DB_NAME"]);
+  const dbName = process.env["SQLITE_DB_NAME"];
 
   const createTableSQLs = (await readFile("./bin/create_table.sql")).toString().split("\n");
   const db = new sqlite3.Database(dbName);
@@ -28,6 +29,10 @@ const { Database } = require("sqlite3");
 
 
   db.close();
+
+  if (process.env["SQLITE_OUTPUT_DIR"]) {
+    await fs.rename(dbName, path.join(process.env["SQLITE_OUTPUT_DIR"], dbName));
+  }
 })();
 
 /**
