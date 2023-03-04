@@ -1,7 +1,11 @@
+import path from "path";
 import * as sqlite3 from "sqlite3";
 const sqlite = sqlite3.verbose();
 
-const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
+const dbName = path.join(
+  process.env["SQLITE_OUTPUT_DIR"] ?? "",
+  process.env["SQLITE_DB_NAME"] ?? "cv.db"
+);
 const db = new sqlite.Database(dbName);
 
 if (process.env.NODE_ENV === "development") {
