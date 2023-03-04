@@ -30,8 +30,14 @@ const { Database } = require("sqlite3");
 
   db.close();
 
-  if (process.env["SQLITE_OUTPUT_DIR"]) {
-    await fs.rename(dbName, path.join(process.env["SQLITE_OUTPUT_DIR"], dbName));
+  const outputDir = process.env["SQLITE_OUTPUT_DIR"];
+
+  if (outputDir && outputDir.length > 0) {
+    try {
+      await fs.mkdir(outputDir)
+    } catch {
+    }
+    await fs.rename(dbName, path.join(outputDir, dbName));
   }
 })();
 
