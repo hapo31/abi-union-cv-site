@@ -14,9 +14,10 @@ const { Database } = require("sqlite3");
   });
 
   const dbName = process.env["SQLITE_DB_NAME"];
+  const dbPath = path.join(process.cwd(), dbName);
 
   const createTableSQLs = (await readFile("./bin/create_table.sql")).toString().split("\n");
-  const db = new sqlite3.Database(dbName);
+  const db = new sqlite3.Database(dbPath);
 
   createTableSQLs.forEach(sql => {
     db.run(sql, (_err) => {
@@ -30,14 +31,15 @@ const { Database } = require("sqlite3");
 
   db.close();
 
-  const outputDir = process.env["SQLITE_OUTPUT_DIR"];
+  const outputDir = path.join(process.cwd(), process.env["SQLITE_OUTPUT_DIR"]);
 
   if (outputDir && outputDir.length > 0) {
     try {
-      await fs.mkdir(outputDir)
+      console.info(`Output ${dbName} dir to:${outputDir}`)
+      await fs.mkdir(outputDir);
     } catch {
     }
-    await fs.rename(dbName, path.join(outputDir, dbName));
+    await fs.rename(dbPath, path.join(outputDir, dbName));
   }
 })();
 
