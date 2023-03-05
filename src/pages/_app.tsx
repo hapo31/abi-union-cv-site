@@ -2,7 +2,7 @@ import fetcher from "@/apiUtil/fetcher";
 import "@/styles/globals.css";
 import styled from "@emotion/styled";
 import type { AppProps } from "next/app";
-import { SWRConfig } from "swr/_internal";
+import { SWRConfig } from "swr";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
