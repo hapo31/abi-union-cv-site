@@ -18,11 +18,8 @@ export default async function createDB(dbName: string, outputDir: string) {
           db.run(sql, (_err) => {});
         }
       });
-      console.log("arknights");
       await imporFromtCsv(db, "arknights", "./assets/arknights.csv");
-      console.log("bluearchive");
       await imporFromtCsv(db, "bluearchive", "./assets/bluearchive.csv");
-      console.log("imas_cinderella");
       await imporFromtCsv(
         db,
         "imas_cinderella",
