@@ -51,19 +51,25 @@ export async function getStaticProps(): Promise<
     path: stage ? `.env.${stage}` : ".env",
   });
 
-  const { distDir }: NextConfig = getConfig();
+  const { serverRuntimeConfig: config }: NextConfig = getConfig();
 
   const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
-  const outputDir = distDir ?? "./";
+  const outputDir = config?.distDir ?? "./";
 
   const dbPath = path.resolve(dbName, outputDir);
 
   let exists = true;
   try {
-    // DBファイルがなければ作る
+    // 存在チェック
     await fs.stat(dbPath);
-    if (!(await tablesExists(dbPath))) {
-      console.info(`${dbPath} was invalid, because table re-create`);
+    if (
+      process.env.NODE_ENV === "production" ||
+      !(await tablesExists(dbPath))
+    ) {
+      console.info(
+        `In prod build or ${dbPath} was invalid, because table will recreate.`
+      );
+      // テーブルがちゃんと作られてないか、productionビルド時はテーブルを消す
       await fs.rm(dbPath);
       exists = false;
     }
