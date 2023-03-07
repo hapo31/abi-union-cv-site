@@ -1,11 +1,17 @@
 import path from "path";
 import * as sqlite3 from "sqlite3";
+import getConfig from "next/config";
+import type Config from "../../next.config";
+
+const { distDir }: typeof Config = getConfig();
+
 const sqlite = sqlite3.verbose();
 
-const dbName = path.join(
-  process.env["SQLITE_OUTPUT_DIR"] ?? "",
+const dbName = path.resolve(
+  distDir ?? "",
   process.env["SQLITE_DB_NAME"] ?? "cv.db"
 );
+
 const db = new sqlite.Database(dbName);
 
 if (process.env.NODE_ENV === "development") {

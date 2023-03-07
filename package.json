@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:update": "node ./bin/import_csv.js"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
