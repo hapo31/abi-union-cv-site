@@ -1,0 +1,19 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install --lts
+        - nvm use --lts
+        - npm i -g pnpm
+        - pnpm install
+    build:
+      commands:
+        - pnpm build && pnpm db:update
+  artifacts:
+    baseDirectory: .next
+    files:
+      - "**/*"
+  cache:
+    paths:
+      - node_modules/**/*
