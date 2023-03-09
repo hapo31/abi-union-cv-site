@@ -22,25 +22,28 @@ export default function useCharactersStore(query: Query) {
     ["CVDatabase", query],
     async ([, query]) => {
       const res = await fetchCVDatabase(query);
-      return res.payload.map<Character>((row) => ({
-        id: `a${row.arknights_id}_b${row.bluearchive_id}_i${row.imas_cinderella_id}`,
-        voiceActor: selectNonNull([
-          row.arknights_cv_name,
-          row.bluearchive_cv_name,
-          row.imas_cinderella_cv_name,
-        ]),
-        voiceActorReading: selectNonNull([
-          row.arknights_cv_name_read,
-          row.bluearchive_cv_name_read,
-          row.imas_cinderella_cv_name_read,
-        ]),
-        arknightsCharacterName: row.arknights_chara,
-        blueArchiveCharacterName: row.bluearchive_chara,
-        imasCynderellaName: row.imas_cinderella_chara,
-        arknightsCharacterNameReading: row.arknights_chara_read,
-        blueArchiveCharacterNameReading: row.bluearchive_chara_read,
-        imasCynderellaNameReading: row.imas_cinderella_chara_read,
-      }));
+      return res.payload.map(
+        (row) =>
+          ({
+            id: `a${row.arknights_id}_b${row.bluearchive_id}_i${row.imas_cinderella_id}`,
+            voiceActor: selectNonNull([
+              row.arknights_cv_name,
+              row.bluearchive_cv_name,
+              row.imas_cinderella_cv_name,
+            ]),
+            voiceActorReading: selectNonNull([
+              row.arknights_cv_name_read,
+              row.bluearchive_cv_name_read,
+              row.imas_cinderella_cv_name_read,
+            ]),
+            arknightsCharacterName: row.arknights_chara,
+            blueArchiveCharacterName: row.bluearchive_chara,
+            imasCynderellaName: row.imas_cinderella_chara,
+            arknightsCharacterNameReading: row.arknights_chara_read,
+            blueArchiveCharacterNameReading: row.bluearchive_chara_read,
+            imasCynderellaNameReading: row.imas_cinderella_chara_read,
+          } satisfies Character)
+      );
     },
     {
       keepPreviousData: true,
