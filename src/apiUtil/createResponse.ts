@@ -19,10 +19,11 @@ export function responseError(
   reason: string,
   params?: unknown
 ) {
-  res.status(HttpStatus[status]).json({
+  const response: ErrorResponse = {
     error: reason,
     params,
-  } satisfies ErrorResponse);
+  };
+  res.status(HttpStatus[status]).json(response);
 }
 
 export function responseOk(
@@ -30,9 +31,10 @@ export function responseOk(
   payload: unknown,
   status: HttpStatus = "OK"
 ) {
-  res.status(HttpStatus[status]).json({
+  const response: Response<unknown> = {
     payload,
-  } satisfies Response<unknown>);
+  };
+  res.status(HttpStatus[status]).json(response);
 }
 
 export function isValidOrReponseError<A, O, I = unknown>(
