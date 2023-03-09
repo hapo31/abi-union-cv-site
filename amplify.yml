@@ -9,7 +9,7 @@ frontend:
         - pnpm install
     build:
       commands:
-        - pnpm build && pnpm db:update
+        - pnpm build
   artifacts:
     baseDirectory: .next
     files:
