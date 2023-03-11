@@ -1,9 +1,13 @@
 import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
-import useCharactersStore, { Character } from "@/store/useCharactersStore";
+import useCharactersStore from "@/store/useCharactersStore";
 import useSearchFilter from "@/store/useSearchFilterCharacter";
+import CachedIcon from "@mui/icons-material/Cached";
 
 import {
+  Alert,
   CircularProgress,
+  IconButton,
+  Snackbar,
   styled,
   Table,
   TableBody,
@@ -24,7 +28,11 @@ type Props = {
 function CVTable({ activeColumns }: Props) {
   const [checkbox] = useClientSideLocalStorage<CheckboxValue>("checkbox", {});
 
-  const { data: records, isLoading } = useCharactersStore({
+  const {
+    data: records,
+    isLoading,
+    error,
+  } = useCharactersStore({
     arknights: checkbox?.arknights ?? false,
     bluearchive: checkbox?.bluearchive ?? false,
     imas_cinderella: checkbox?.imasCinderella ?? false,
@@ -102,22 +110,57 @@ function CVTable({ activeColumns }: Props) {
             </CharaCell>
           </StyledHeaderRow>
         </TableHead>
-        <TableBody>
-          {filteredRecords == null || isLoading ? (
-            <CircularProgress />
-          ) : (
-            filteredRecords.map((row) => (
-              <StyledRow key={row.id}>
-                <TableCell>{row.voiceActor}</TableCell>
-                <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>
-                <CharaCell>{row.blueArchiveCharacterName ?? "-"}</CharaCell>
-                <CharaCell>{row.imasCynderellaName ?? "-"}</CharaCell>
-              </StyledRow>
-            ))
-          )}
-        </TableBody>
+        {error == null ? (
+          <TableBody>
+            {filteredRecords == null || isLoading ? (
+              <CircularProgress />
+            ) : (
+              filteredRecords.map((row) => (
+                <StyledRow key={row.id}>
+                  <TableCell>{row.voiceActor}</TableCell>
+                  <CharaCell>{row.arknightsCharacterName ?? "-"}</CharaCell>
+                  <CharaCell>{row.blueArchiveCharacterName ?? "-"}</CharaCell>
+                  <CharaCell>{row.imasCynderellaName ?? "-"}</CharaCell>
+                </StyledRow>
+              ))
+            )}
+          </TableBody>
+        ) : null}
       </Table>
+      {error != null ? <ErrorAlert message={JSON.stringify(error)} /> : null}
     </TableContainer>
+  );
+}
+
+type AlertProps = {
+  message: string;
+};
+
+function ErrorAlert({ message }: AlertProps) {
+  return (
+    <>
+      <Alert sx={{ width: "100%", minWidth: "300px" }} severity="error">
+        <p>以下のエラーが発生したようです。</p>
+        <code>{message}</code>
+        <div>
+          <ReloadButton />
+        </div>
+      </Alert>
+    </>
+  );
+}
+
+function ReloadButton() {
+  return (
+    <IconButton
+      color="primary"
+      size="small"
+      aria-label="reload"
+      onClick={() => location.reload()}
+    >
+      <CachedIcon fontSize="small" />
+      ページを再読み込み
+    </IconButton>
   );
 }
 
