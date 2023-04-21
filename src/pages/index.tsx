@@ -50,13 +50,3 @@ export default function App() {
     </SWRConfig>
   );
 }
-
-export async function getStaticProps(): Promise<
-  ReturnType<GetStaticProps<Props>>
-> {
-  return {
-    props: {
-      buildTime: Date.now(),
-    },
-  };
-}
