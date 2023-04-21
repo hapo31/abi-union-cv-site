@@ -2,6 +2,9 @@ import path from "path";
 import * as sqlite3 from "sqlite3";
 import getConfig from "next/config";
 import type Config from "../../next.config";
+import fs from "fs/promises";
+import fetch from "isomorphic-fetch";
+import { Database } from "sqlite3";
 
 const { distDir }: typeof Config = getConfig();
 
@@ -12,20 +15,18 @@ const dbName = path.resolve(
   process.env["SQLITE_DB_NAME"] ?? "cv.db"
 );
 
-const db = new sqlite.Database(dbName);
+const dbUrl = process.env["SQLITE_URL"] ?? "";
 
-if (process.env.NODE_ENV === "development") {
-  db.on("trace", (sql) => console.log(sql));
-}
-db.on("error", (err) => console.error(err));
+let db: Database | null = null;
 
 export default async function all<T = any>(
   sql: string,
   params: unknown = []
 ): Promise<T[]> {
+  await fetchDB();
   return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      db.all(sql, params, (err, row) => {
+    db?.serialize(() => {
+      db?.all(sql, params, (err, row) => {
         if (err) {
           reject(err);
         } else {
@@ -34,4 +35,18 @@ export default async function all<T = any>(
       });
     });
   });
+}
+
+async function fetchDB() {
+  try {
+    await fs.stat(dbName);
+    if (db == null) {
+      throw new Error("db not initialized");
+    }
+  } catch {
+    const res = await fetch(dbUrl);
+    const buffer = await res.arrayBuffer();
+    fs.writeFile(dbName, new DataView(buffer));
+    db = new sqlite.Database(dbName);
+  }
 }

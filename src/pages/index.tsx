@@ -2,12 +2,7 @@ import { AppBar, Box, Card, Toolbar } from "@mui/material";
 import ShowController, { CheckboxValue } from "@/components/ShowController";
 import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
 import CVTable from "@/components/CVTable";
-import { GetStaticProps, NextConfig } from "next";
-import createDB, { tablesExists } from "@/apiUtil/createDB";
-import dotenv from "dotenv";
-import fs from "fs/promises";
-import getConfig from "next/config";
-import path from "path";
+import { GetStaticProps } from "next";
 import fetcher from "@/apiUtil/fetcher";
 import { SWRConfig } from "swr";
 
@@ -59,42 +54,6 @@ export default function App() {
 export async function getStaticProps(): Promise<
   ReturnType<GetStaticProps<Props>>
 > {
-  const stage = process.env.STAGE;
-
-  dotenv.config({
-    path: stage ? `.env.${stage}` : ".env",
-  });
-
-  const { serverRuntimeConfig: config }: NextConfig = getConfig();
-
-  const dbName = process.env["SQLITE_DB_NAME"] ?? "cv.db";
-  const outputDir = config?.distDir ?? "./";
-
-  const dbPath = path.resolve(dbName, outputDir);
-
-  let exists = true;
-  try {
-    // 存在チェック
-    await fs.stat(dbPath);
-    if (
-      process.env.NODE_ENV === "production" ||
-      !(await tablesExists(dbPath))
-    ) {
-      console.info(
-        `In prod build or ${dbPath} was invalid, because table will recreate.`
-      );
-      // テーブルがちゃんと作られてないか、productionビルド時はテーブルを消す
-      await fs.rm(dbPath);
-      exists = false;
-    }
-  } catch {
-    exists = false;
-  }
-  if (!exists) {
-    const outputPath = await createDB(dbName, outputDir);
-    console.info(`Create db to ${outputPath} successful.`);
-  }
-
   return {
     props: {
       buildTime: Date.now(),
