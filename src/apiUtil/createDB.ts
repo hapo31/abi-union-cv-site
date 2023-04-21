@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import sqlite3 from "sqlite3";
+import * as sqlite3 from "sqlite3";
 import { parse as csvParse } from "csv-parse/sync";
 import { readFile } from "fs/promises";
 import { Database } from "sqlite3";
@@ -11,7 +11,7 @@ export default async function createDB(dbName: string, outputDir: string) {
     (async () => {
       const createTableSQLs = (await readFile("./src/apiUtil/create_table.sql"))
         .toString()
-        .replaceAll("\n", "")
+        .replace(/\n/g, "")
         .split(";");
       db.serialize(() => {
         for (const sql of createTableSQLs) {
