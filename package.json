@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "create:db": "ts-node ./src/apiUtil/createDB.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -37,6 +38,7 @@
   },
   "devDependencies": {
     "@types/isomorphic-fetch": "^0.0.36",
-    "@typescript-eslint/parser": "^5.54.1"
+    "@typescript-eslint/parser": "^5.54.1",
+    "ts-node": "^10.9.1"
   }
 }
