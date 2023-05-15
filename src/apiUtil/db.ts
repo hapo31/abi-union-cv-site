@@ -6,7 +6,7 @@ import fs from "fs/promises";
 import fetch from "isomorphic-fetch";
 import { Database } from "sqlite3";
 
-const { distDir }: typeof Config = getConfig();
+const { distDir }: typeof Config = getConfig() ?? {};
 
 const sqlite = sqlite3.verbose();
 
