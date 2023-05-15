@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create:db": "ts-node ./src/apiUtil/createDB.ts"
+    "create:db": "ts-node ./src/apiUtil/createDB.ts",
+    "update:db": "ts-node -r tsconfig-paths/register ./bin/scrape/index.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.10.5",
@@ -42,6 +43,7 @@
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/jsdom": "^21.1.1",
     "@typescript-eslint/parser": "^5.54.1",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0"
   }
 }
