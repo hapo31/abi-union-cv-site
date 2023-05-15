@@ -23,10 +23,10 @@ export default async function all<T = any>(
   sql: string,
   params: unknown = []
 ): Promise<T[]> {
-  await fetchDB();
+  const db = await fetchDB();
   return new Promise((resolve, reject) => {
-    db?.serialize(() => {
-      db?.all(sql, params, (err, row) => {
+    db.serialize(() => {
+      db.all(sql, params, (err, row) => {
         if (err) {
           reject(err);
         } else {
@@ -41,12 +41,13 @@ async function fetchDB() {
   try {
     await fs.stat(dbName);
     if (db == null) {
-      throw new Error("db not initialized");
+      throw new Error("can not initialize");
     }
+    return db;
   } catch {
     const res = await fetch(dbUrl);
     const buffer = await res.arrayBuffer();
     fs.writeFile(dbName, new DataView(buffer));
-    db = new sqlite.Database(dbName);
+    return (db = new sqlite.Database(dbName));
   }
 }
