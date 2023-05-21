@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "create:db": "ts-node ./src/apiUtil/createDB.ts",
+    "create:db": "ts-node ./bin/createDB.ts",
     "update:db": "ts-node -r tsconfig-paths/register ./bin/scrape/index.ts"
   },
   "dependencies": {

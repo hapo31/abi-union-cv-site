@@ -1,12 +1,13 @@
 import fs from "fs";
 import path from "path";
-import * as sqlite3 from "sqlite3";
+import sqlite3 from "sqlite3";
 import { parse as csvParse } from "csv-parse/sync";
 import { readFile } from "fs/promises";
 import { Database } from "sqlite3";
 
 export default async function createDB(dbName: string, outputDir: string) {
-  const db = new sqlite3.Database(dbName);
+  const sqlite = sqlite3.verbose();
+  const db = new sqlite.Database(dbName);
   return new Promise((resolve, reject) => {
     (async () => {
       const createTableSQLs = (await readFile("./src/apiUtil/create_table.sql"))
