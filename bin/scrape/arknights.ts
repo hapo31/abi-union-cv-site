@@ -1,7 +1,8 @@
 import { Database } from "sqlite3";
 import { execQuery, fetchPage, getVoiceActorReadFromWikipedia } from "./utils";
+import pLimit from "p-limit";
 
-export default async function arknightsIndex(db: Database) {
+export default async function arknightsIndex(db: Database, concurrency = 3) {
   const charList = await fetchCharList(
     encodeURI("https://arknights.wikiru.jp/?オペレーター実装履歴")
   );
@@ -18,17 +19,21 @@ export default async function arknightsIndex(db: Database) {
 
   const diffCharas = charList.filter((chara) => !chara.startsWith("*1"));
 
-  const cvList = await Promise.all(
-    diffCharas.map(async (chara) => {
-      const cv = await getVoiceActor(chara);
-      const cvRead = await getVoiceActorReadFromWikipedia(cv);
+  const limit = pLimit(concurrency);
 
-      return {
-        chara,
-        cv_name: cv,
-        cv_name_read: cvRead,
-      };
-    })
+  const cvList = await Promise.all(
+    diffCharas.map((chara) =>
+      limit(async () => {
+        const cv = await getVoiceActor(chara);
+        const cvRead = await getVoiceActorReadFromWikipedia(cv);
+
+        return {
+          chara,
+          cv_name: cv,
+          cv_name_read: cvRead,
+        };
+      })
+    )
   );
 
   return cvList;
