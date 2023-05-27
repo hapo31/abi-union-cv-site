@@ -2,7 +2,6 @@ import { AppBar, Box, Card, Toolbar } from "@mui/material";
 import ShowController, { CheckboxValue } from "@/components/ShowController";
 import useClientSideLocalStorage from "@/hooks/useClientSideLocalStorage";
 import CVTable from "@/components/CVTable";
-import { GetStaticProps } from "next";
 import fetcher from "@/apiUtil/fetcher";
 import { SWRConfig } from "swr";
 
