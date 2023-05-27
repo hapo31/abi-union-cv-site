@@ -15,3 +15,11 @@ export type CVEntity = {
   bluearchive_chara_read?: string;
   imas_cinderella_chara_read?: string;
 };
+
+export type CVTable = {
+  id: number;
+  cv_name: string;
+  cv_name_read: string;
+  chara: string;
+  chara_read?: string;
+};
