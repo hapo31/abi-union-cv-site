@@ -2,12 +2,10 @@
 const distDir = ".next";
 
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+export const nextConfig = {
   reactStrictMode: true,
   distDir,
   serverRuntimeConfig: {
     distDir,
   }
 }
-
-module.exports = nextConfig
