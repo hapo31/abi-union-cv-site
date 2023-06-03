@@ -12,12 +12,7 @@ import { useDebounce, useLocalStorage } from "react-use";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 import useSearchFilter from "@/store/useSearchFilterCharacter";
-
-export type CheckboxValue = {
-  arknights?: boolean;
-  bluearchive?: boolean;
-  imasCinderella?: boolean;
-};
+import { CheckboxValue } from "@/hooks/useCheckboxQuery";
 
 type FormValues = CheckboxValue & {
   search: string;

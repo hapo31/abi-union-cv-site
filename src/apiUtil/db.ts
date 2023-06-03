@@ -1,7 +1,7 @@
 import path from "path";
 import * as sqlite3 from "sqlite3";
 import getConfig from "next/config";
-import type Config from "../../next.config";
+import type Config from "../../next.config.mjs";
 import fs from "fs/promises";
 import fetch from "isomorphic-fetch";
 import { Database } from "sqlite3";
@@ -15,7 +15,7 @@ const dbName = path.resolve(
   process.env["SQLITE_DB_NAME"] ?? "cv.db"
 );
 
-const dbUrl = process.env["SQLITE_URL"] ?? "";
+const dbUrl = process.env["SQLITE_URL"] ?? undefined;
 
 let db: Database | null = null;
 
@@ -45,9 +45,11 @@ async function fetchDB() {
     }
     return db;
   } catch {
-    const res = await fetch(dbUrl);
-    const buffer = await res.arrayBuffer();
-    fs.writeFile(dbName, new DataView(buffer));
+    if (dbUrl != null) {
+      const res = await fetch(dbUrl);
+      const buffer = await res.arrayBuffer();
+      fs.writeFile(dbName, new DataView(buffer));
+    }
     return (db = new sqlite.Database(dbName));
   }
 }
